@@ -13,5 +13,6 @@ RUN python -m pip install --no-cache-dir -r requirements.txt
 COPY . .
 COPY --from=frontend-build /build/dist ./frontend/dist
 
+ENV PYTHONPATH=/app/backend
 EXPOSE 10000
 CMD ["sh", "-c", "exec waitress-serve --listen=0.0.0.0:${PORT:-10000} --threads=1 --max-request-body-size=16842752 backend.app:app"]
