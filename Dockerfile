@@ -1,21 +1,16 @@
 FROM node:22-bookworm-slim AS frontend-build
 WORKDIR /build
 
-COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci --include=dev
+COPY frontend/ ./
+RUN npm ci --include=dev && npm run build
 
-COPY frontend/index.html frontend/vite.config.js ./
-COPY frontend/src ./src
-COPY frontend/public ./public
-RUN npm run build
-
-FROM python:3.12-slim-bookworm
+FROM python:3.13-slim-bookworm
 WORKDIR /app
 
-COPY backend/requirements.txt ./backend/requirements.txt
-RUN pip install --no-cache-dir -r backend/requirements.txt
+COPY requirements.txt ./
+RUN python -m pip install --no-cache-dir -r requirements.txt
 
-COPY backend/app.py backend/algorithms.py ./backend/
+COPY . .
 COPY --from=frontend-build /build/dist ./frontend/dist
 
 EXPOSE 10000
